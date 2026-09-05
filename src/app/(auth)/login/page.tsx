@@ -20,6 +20,13 @@ export default function LoginPage() {
           <span className="text-lg font-semibold">{APP_NAME}</span>
         </div>
 
+        {!process.env.NEXT_PUBLIC_SUPABASE_URL ? (
+          <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            Supabase environment variables are missing on this deployment. Set
+            NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY, then redeploy.
+          </p>
+        ) : null}
+
         <Card>
           <CardHeader>
             <CardTitle>Sign in</CardTitle>

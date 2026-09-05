@@ -6,6 +6,12 @@ const PUBLIC_PATHS = ["/login", "/signup", "/auth"];
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  // Misconfigured deployment: fall through instead of crashing the edge
+  // runtime, so the sign-in page can still render and report the problem.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return response;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
