@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": ".check",
+    "incremental": false,
+    "plugins": []
+  },
+  "include": ["src/lib/status.ts", "src/lib/compliance.ts", "src/lib/types.ts", "src/lib/status.check.ts"]
+}
