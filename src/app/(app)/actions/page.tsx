@@ -14,8 +14,8 @@ export default async function ActionsPage() {
   const { documents, compliance } = await getDashboardData();
 
   const expired = documents.filter((d) => d.status === "expired");
-  const renewNow = documents.filter((d) => d.days >= 0 && d.days <= 7);
-  const comingSoon = documents.filter((d) => d.days > 7 && d.days <= 30);
+  const renewNow = documents.filter((d) => d.days !== null && d.days >= 0 && d.days <= 7);
+  const comingSoon = documents.filter((d) => d.days !== null && d.days > 7 && d.days <= 30);
   const missing = compliance.filter((c) => c.compliance.missingTypes.length > 0);
 
   const sections = [

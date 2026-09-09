@@ -20,6 +20,7 @@ export type DocumentType = {
   name: string;
   code: string;
   is_required: boolean;
+  requires_expiry: boolean;
   sort_order: number;
   is_active: boolean;
 };
@@ -48,7 +49,7 @@ export type VehicleDocument = {
   document_type_id: string;
   document_number: string | null;
   issue_date: string | null;
-  expiry_date: string;
+  expiry_date: string | null;
   file_path: string | null;
   file_name: string | null;
   file_size: number | null;
@@ -85,13 +86,13 @@ export type AppNotification = {
 
 /** Document joined with its type + vehicle, as the UI consumes it. */
 export type DocumentRow = VehicleDocument & {
-  document_type: Pick<DocumentType, "id" | "name" | "code" | "is_required"> | null;
+  document_type: Pick<DocumentType, "id" | "name" | "code" | "is_required" | "requires_expiry"> | null;
   vehicle: Pick<Vehicle, "id" | "registration_number" | "vehicle_type"> | null;
 };
 
 export type VehicleWithDocuments = Vehicle & {
   driver: Pick<Driver, "id" | "name" | "phone"> | null;
-  documents: (VehicleDocument & { document_type: Pick<DocumentType, "id" | "name" | "code" | "is_required"> | null })[];
+  documents: (VehicleDocument & { document_type: Pick<DocumentType, "id" | "name" | "code" | "is_required" | "requires_expiry"> | null })[];
 };
 
 export type VehicleCompliance = {

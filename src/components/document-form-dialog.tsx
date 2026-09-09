@@ -54,6 +54,10 @@ export function DocumentFormDialog({
   const title =
     mode === "create" ? "Add document" : mode === "edit" ? "Edit document" : "Renew document";
 
+  // Some types (Registration Certificate) never expire - the type decides.
+  const selectedType = documentTypes.find((t) => t.id === typeId);
+  const requiresExpiry = selectedType ? selectedType.requires_expiry : true;
+
   async function onSubmit(formData: FormData) {
     setError(null);
     setSaving(true);
@@ -102,7 +106,9 @@ export function DocumentFormDialog({
           <DialogDescription>
             {mode === "renew"
               ? "The current document is archived to history and replaced with this new one."
-              : "Status is calculated automatically from the expiry date."}
+              : requiresExpiry
+                ? "Status is calculated automatically from the expiry date."
+                : `${selectedType?.name ?? "This document"} has no expiry date, so it never needs renewing.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -128,8 +134,19 @@ export function DocumentFormDialog({
               <Input id="issue_date" name="issue_date" type="date" defaultValue={mode === "renew" ? "" : defaults?.issue_date ?? ""} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="expiry_date">Expiry date <span className="text-destructive">*</span></Label>
-              <Input id="expiry_date" name="expiry_date" type="date" required defaultValue={mode === "renew" ? "" : defaults?.expiry_date ?? ""} />
+              <Label htmlFor="expiry_date">
+                Expiry date{" "}
+                {requiresExpiry
+                  ? <span className="text-destructive">*</span>
+                  : <span className="font-normal text-muted-foreground">(not applicable)</span>}
+              </Label>
+              <Input
+                id="expiry_date"
+                name="expiry_date"
+                type="date"
+                required={requiresExpiry}
+                defaultValue={mode === "renew" ? "" : defaults?.expiry_date ?? ""}
+              />
             </div>
           </div>
 

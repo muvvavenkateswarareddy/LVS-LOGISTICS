@@ -25,10 +25,11 @@ export function getVehicleCompliance(
   const nextExpiry =
     current
       .map((d) => d.expiry_date)
+      .filter((d): d is string => !!d)
       .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())[0] ?? null;
 
   const status: DocumentStatus | "missing" =
-    missingTypes.length > 0 && (!worst || worst === "valid" || worst === "upcoming")
+    missingTypes.length > 0 && (!worst || worst === "valid" || worst === "upcoming" || worst === "no_expiry")
       ? "missing"
       : (worst ?? "missing");
 

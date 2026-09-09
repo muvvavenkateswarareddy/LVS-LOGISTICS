@@ -3,7 +3,7 @@
  * Run: npm run check
  */
 import assert from "node:assert/strict";
-import { getDaysRemaining, getDocumentStatus } from "./status";
+import { expiresWithin, formatDaysRemaining, getDaysRemaining, getDocumentStatus } from "./status";
 import { getVehicleCompliance } from "./compliance";
 
 const today = new Date("2026-09-05T10:30:00Z");
@@ -48,5 +48,27 @@ const empty = getVehicleCompliance({ documents: [] } as never, types, today);
 assert.equal(empty.score, 0);
 assert.equal(empty.status, "missing");
 assert.deepEqual(empty.missingTypes, ["Insurance", "Fitness"]);
+
+// documents with no expiry date (Registration Certificate) never expire
+assert.equal(getDaysRemaining(null, today), null);
+assert.equal(getDocumentStatus(null, today), "no_expiry");
+assert.equal(formatDaysRemaining(null), "No expiry");
+assert.equal(expiresWithin(null, 30, today), false);
+assert.equal(expiresWithin(day(10), 30, today), true);
+assert.equal(expiresWithin(day(-1), 30, today), false, "already expired is not 'expiring within'");
+
+const noExpiry = getVehicleCompliance(
+  {
+    documents: [
+      { id: "n1", document_type_id: "t1", expiry_date: null, is_current: true },
+      { id: "n2", document_type_id: "t2", expiry_date: day(200), is_current: true },
+    ],
+  } as never,
+  types,
+  today,
+);
+assert.equal(noExpiry.score, 100, "a document without an expiry counts as valid");
+assert.equal(noExpiry.status, "valid");
+assert.equal(noExpiry.nextExpiry, day(200), "null expiries are skipped when finding the next one");
 
 console.log("status engine + compliance checks passed");

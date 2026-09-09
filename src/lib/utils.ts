@@ -17,4 +17,5 @@ export function toISODate(value: Date) {
   return value.toISOString().slice(0, 10);
 }
 
-export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "FleetGuard";
+export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "LVS Logistics";
+export const APP_TAGLINE = "Energy in safe hands";

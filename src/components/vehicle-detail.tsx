@@ -41,7 +41,7 @@ export function VehicleDetail({
       ...d,
       vehicle: { id: vehicle.id, registration_number: vehicle.registration_number, vehicle_type: vehicle.vehicle_type },
     }))
-    .sort((a, b) => a.expiry_date.localeCompare(b.expiry_date));
+    .sort((a, b) => (a.expiry_date ?? "9999-12-31").localeCompare(b.expiry_date ?? "9999-12-31"));
 
   const facts = [
     ["Type", vehicle.vehicle_type],

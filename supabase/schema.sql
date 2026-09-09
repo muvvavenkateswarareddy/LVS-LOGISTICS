@@ -72,6 +72,7 @@ create table if not exists public.document_types (
   name        text not null,
   code        text not null,
   is_required boolean not null default true,
+  requires_expiry boolean not null default true,
   sort_order  integer not null default 100,
   is_active   boolean not null default true,
   created_at  timestamptz not null default now(),
@@ -88,7 +89,7 @@ create table if not exists public.documents (
   document_type_id  uuid not null references public.document_types(id) on delete restrict,
   document_number   text,
   issue_date        date,
-  expiry_date       date not null,
+  expiry_date       date,
   file_path         text,
   file_name         text,
   file_size         integer,
@@ -218,16 +219,15 @@ begin
   values (new.id, coalesce(new.raw_user_meta_data->>'fleet_name', 'My Fleet'))
   returning id into v_fleet_id;
 
-  insert into public.document_types (fleet_id, name, code, is_required, sort_order) values
-    (v_fleet_id, 'Insurance',              'insurance',    true,  10),
-    (v_fleet_id, 'Fitness Certificate',    'fitness',      true,  20),
-    (v_fleet_id, 'Permit',                 'permit',       true,  30),
-    (v_fleet_id, 'PUC',                    'puc',          true,  40),
-    (v_fleet_id, 'Road Tax',               'road_tax',     true,  50),
-    (v_fleet_id, 'Registration Certificate','rc',          true,  60),
-    (v_fleet_id, 'National Permit',        'national_permit', false, 70),
-    (v_fleet_id, 'State Permit',           'state_permit', false, 80),
-    (v_fleet_id, 'Other',                  'other',        false, 90);
+  insert into public.document_types (fleet_id, name, code, is_required, requires_expiry, sort_order) values
+    (v_fleet_id, 'Insurance',               'insurance',      true,  true,  10),
+    (v_fleet_id, 'CLL Insurance',           'cll_insurance',  true,  true,  15),
+    (v_fleet_id, 'Fitness Certificate',     'fitness',        true,  true,  20),
+    (v_fleet_id, 'Permit',                  'permit',         true,  true,  30),
+    (v_fleet_id, 'PUC',                     'puc',            true,  true,  40),
+    (v_fleet_id, 'Road Tax',                'road_tax',       true,  true,  50),
+    (v_fleet_id, 'Registration Certificate','rc',             true,  false, 60),
+    (v_fleet_id, 'Other',                   'other',          false, true,  90);
 
   insert into public.notification_preferences (fleet_id, user_id) values (v_fleet_id, new.id)
   on conflict do nothing;
@@ -365,7 +365,7 @@ begin
       from public.documents d
       join public.vehicles v on v.id = d.vehicle_id
       join public.document_types dt on dt.id = d.document_type_id
-     where d.fleet_id = p_fleet_id and d.is_current
+     where d.fleet_id = p_fleet_id and d.is_current and d.expiry_date is not null
   ), matched as (
     select c.*,
            case when c.days_left < 0 then -1

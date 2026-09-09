@@ -1,4 +1,4 @@
-# FleetGuard
+# LVS Logistics · fleet compliance
 
 Fleet document compliance for lorry/truck operators. Tracks insurance, fitness,
 permit, PUC, road tax and registration expiry across the whole fleet and shows —
@@ -22,7 +22,7 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn-style UI · Supabase
    NEXT_PUBLIC_SUPABASE_URL=
    NEXT_PUBLIC_SUPABASE_ANON_KEY=
    SUPABASE_SERVICE_ROLE_KEY=      # server only, never NEXT_PUBLIC_
-   NEXT_PUBLIC_APP_NAME=FleetGuard # rebrand here
+   NEXT_PUBLIC_APP_NAME=LVS Logistics # rebrand here
    ```
 
 3. **Database** — in the Supabase SQL editor run, in order:
@@ -30,6 +30,8 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn-style UI · Supabase
    - `supabase/schema.sql` — tables, indexes, RLS, triggers, storage bucket,
      `renew_document()`, `generate_document_notifications()`
    - `supabase/demo_data.sql` — `seed_demo_data()` / `remove_demo_data()`
+   - `supabase/migration_2026_09_09.sql` — only for databases created before
+     09 Sep 2026 (CLL Insurance, permit types removed, optional expiry)
 
    Signing up creates the user's fleet, the nine default document types and
    notification preferences automatically (trigger on `auth.users`).
@@ -56,7 +58,8 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn-style UI · Supabase
 
 **Status is never stored.** `src/lib/status.ts` derives it from the expiry date:
 expired (< 0 days), critical (0–7), warning (8–30), upcoming (31–60), valid
-(> 60). Every table, badge, report and notification calls the same two
+(> 60), and `no_expiry` for types where `document_types.requires_expiry` is
+false (Registration Certificate). Every table, badge, report and notification calls the same two
 functions — `getDocumentStatus()` and `getDaysRemaining()`.
 
 **Compliance** (`src/lib/compliance.ts`) = required document types held with a

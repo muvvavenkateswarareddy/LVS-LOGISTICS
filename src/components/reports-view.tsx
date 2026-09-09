@@ -51,20 +51,20 @@ export function ReportsView({
     document_type: d.document_type?.name ?? "",
     document_number: d.document_number ?? "",
     issue_date: d.issue_date ?? "",
-    expiry_date: d.expiry_date,
+    expiry_date: d.expiry_date ?? "",
     days_remaining: getDaysRemaining(d.expiry_date),
     status: STATUS_LABEL[getDocumentStatus(d.expiry_date)],
   });
 
   const expiring = documents
     .map(decorate)
-    .filter((r) => r.days_remaining >= 0 && r.days_remaining <= Number(days))
-    .sort((a, b) => a.days_remaining - b.days_remaining);
+    .filter((r) => r.days_remaining !== null && r.days_remaining >= 0 && r.days_remaining <= Number(days))
+    .sort((a, b) => (a.days_remaining ?? 0) - (b.days_remaining ?? 0));
 
   const expired = documents
     .map(decorate)
-    .filter((r) => r.days_remaining < 0)
-    .sort((a, b) => a.days_remaining - b.days_remaining);
+    .filter((r) => r.days_remaining !== null && r.days_remaining < 0)
+    .sort((a, b) => (a.days_remaining ?? 0) - (b.days_remaining ?? 0));
 
   const complianceRows = vehicles
     .map((v) => {
@@ -87,7 +87,7 @@ export function ReportsView({
     const expiredCount = docs.filter((d) => getDocumentStatus(d.expiry_date) === "expired").length;
     const soon = docs.filter((d) => {
       const n = getDaysRemaining(d.expiry_date);
-      return n >= 0 && n <= 30;
+      return n !== null && n >= 0 && n <= 30;
     }).length;
     return {
       document_type: t.name,
@@ -139,7 +139,7 @@ export function ReportsView({
                         <TableCell>{r.document_type}</TableCell>
                         <TableCell className="text-muted-foreground">{r.document_number || "—"}</TableCell>
                         <TableCell>{formatDate(r.expiry_date)}</TableCell>
-                        <TableCell className="tabular-nums">{r.days_remaining}</TableCell>
+                        <TableCell className="tabular-nums">{r.days_remaining ?? "—"}</TableCell>
                         <TableCell><StatusBadge status={getDocumentStatus(r.expiry_date)} /></TableCell>
                       </TableRow>
                     ))}
@@ -174,7 +174,7 @@ export function ReportsView({
                         <TableCell>{r.document_type}</TableCell>
                         <TableCell className="text-muted-foreground">{r.document_number || "—"}</TableCell>
                         <TableCell>{formatDate(r.expiry_date)}</TableCell>
-                        <TableCell className="tabular-nums text-red-700">{Math.abs(r.days_remaining)}</TableCell>
+                        <TableCell className="tabular-nums text-red-700">{Math.abs(r.days_remaining ?? 0)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

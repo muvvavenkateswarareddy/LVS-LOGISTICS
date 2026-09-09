@@ -13,7 +13,7 @@ export function DocumentCard({
   registration: string;
   documentName: string;
   documentNumber?: string | null;
-  expiryDate: string;
+  expiryDate: string | null;
   hint?: string;
 }) {
   return (

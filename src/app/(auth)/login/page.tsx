@@ -1,7 +1,7 @@
 "use client";
 import { useActionState } from "react";
 import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
+import Image from "next/image";
 import { signIn } from "@/server/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,9 +15,8 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-dvh items-center justify-center bg-muted/40 p-4">
       <div className="w-full max-w-sm space-y-4">
-        <div className="flex items-center justify-center gap-2">
-          <span className="rounded-md bg-primary p-1.5 text-primary-foreground"><ShieldCheck className="h-5 w-5" /></span>
-          <span className="text-lg font-semibold">{APP_NAME}</span>
+        <div className="flex flex-col items-center gap-1">
+          <Image src="/logo.png" alt={APP_NAME} width={220} height={192} priority className="h-auto w-[200px]" />
         </div>
 
         {!process.env.NEXT_PUBLIC_SUPABASE_URL ? (

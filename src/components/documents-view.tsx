@@ -15,6 +15,7 @@ const STATUS_FILTERS = [
   { value: "warning", label: "Warning · 8-30 days" },
   { value: "upcoming", label: "Upcoming · 31-60 days" },
   { value: "valid", label: "Valid" },
+  { value: "no_expiry", label: "No expiry date" },
   { value: "30", label: "Expiring within 30 days" },
   { value: "60", label: "Expiring within 60 days" },
 ];
@@ -37,8 +38,8 @@ export function DocumentsView({
       .filter((d) => {
         if (typeId !== "all" && d.document_type_id !== typeId) return false;
         const days = getDaysRemaining(d.expiry_date);
-        if (status === "30") return days >= 0 && days <= 30;
-        if (status === "60") return days >= 0 && days <= 60;
+        if (status === "30") return days !== null && days >= 0 && days <= 30;
+        if (status === "60") return days !== null && days >= 0 && days <= 60;
         if (status !== "all" && getDocumentStatus(d.expiry_date) !== status) return false;
         if (!q) return true;
         return (
@@ -50,7 +51,7 @@ export function DocumentsView({
       .sort(
         (a, b) =>
           STATUS_ORDER[getDocumentStatus(a.expiry_date)] - STATUS_ORDER[getDocumentStatus(b.expiry_date)] ||
-          a.expiry_date.localeCompare(b.expiry_date),
+          (a.expiry_date ?? "9999-12-31").localeCompare(b.expiry_date ?? "9999-12-31"),
       );
   }, [documents, query, status, typeId]);
 

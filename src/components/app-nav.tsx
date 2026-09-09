@@ -2,8 +2,9 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import {
-  BarChart3, Bell, FileText, LayoutDashboard, LogOut, Settings, ShieldCheck,
+  BarChart3, Bell, FileText, LayoutDashboard, LogOut, Settings,
   Truck, Users, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,8 +58,10 @@ export function SidebarContent({
   const pathname = usePathname();
   return (
     <div className="flex h-full flex-col bg-primary text-primary-foreground">
-      <div className="flex items-center gap-2 px-4 py-4">
-        <span className="rounded-md bg-white/15 p-1.5"><ShieldCheck className="h-5 w-5" aria-hidden /></span>
+      <div className="flex items-center gap-2.5 px-4 py-4">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white p-1">
+          <Image src="/logo-mark.png" alt="" width={40} height={20} className="h-auto w-full" priority />
+        </span>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold">{APP_NAME}</p>
           <p className="truncate text-xs text-white/60">{fleetName}</p>

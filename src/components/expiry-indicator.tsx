@@ -7,9 +7,10 @@ const TONE = {
   warning: "text-amber-700 font-medium",
   upcoming: "text-yellow-700",
   valid: "text-muted-foreground",
+  no_expiry: "text-muted-foreground",
 } as const;
 
-export function ExpiryIndicator({ expiryDate, className }: { expiryDate: string; className?: string }) {
+export function ExpiryIndicator({ expiryDate, className }: { expiryDate: string | null; className?: string }) {
   const days = getDaysRemaining(expiryDate);
   const status = getDocumentStatus(expiryDate);
   return <span className={cn("whitespace-nowrap text-sm tabular-nums", TONE[status], className)}>{formatDaysRemaining(days)}</span>;

@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, CircleAlert, CircleSlash, Clock } from "lucide-react";
+import { AlertTriangle, CheckCircle2, CircleAlert, CircleSlash, Clock, Infinity as InfinityIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STATUS_LABEL, type DocumentStatus } from "@/lib/status";
 
@@ -11,6 +11,7 @@ const STYLES: Record<Kind, { className: string; Icon: typeof CheckCircle2; label
   warning:  { className: "bg-amber-50 text-amber-800 border-amber-200", Icon: AlertTriangle, label: "Warning" },
   upcoming: { className: "bg-yellow-50 text-yellow-800 border-yellow-200", Icon: Clock, label: "Upcoming" },
   valid:    { className: "bg-emerald-50 text-emerald-700 border-emerald-200", Icon: CheckCircle2, label: "Valid" },
+  no_expiry:{ className: "bg-slate-50 text-slate-600 border-slate-200", Icon: InfinityIcon, label: "No expiry" },
   missing:  { className: "bg-slate-100 text-slate-700 border-slate-200", Icon: CircleSlash, label: "Missing docs" },
 };
 

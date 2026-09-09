@@ -49,7 +49,7 @@ const VEHICLE_SELECT = `
   driver:drivers(id, name, phone),
   documents(
     *,
-    document_type:document_types(id, name, code, is_required)
+    document_type:document_types(id, name, code, is_required, requires_expiry)
   )
 `;
 
@@ -92,7 +92,7 @@ export const getDocuments = cache(async (currentOnly = true): Promise<DocumentRo
   if (!fleet) return [];
   let q = supabase
     .from("documents")
-    .select(`*, document_type:document_types(id, name, code, is_required),
+    .select(`*, document_type:document_types(id, name, code, is_required, requires_expiry),
              vehicle:vehicles(id, registration_number, vehicle_type)`)
     .eq("fleet_id", fleet.id);
   if (currentOnly) q = q.eq("is_current", true);
@@ -136,14 +136,16 @@ export async function getDashboardData() {
   );
 
   const sorted = [...documents].sort(
-    (a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || a.days - b.days,
+    (a, b) =>
+      STATUS_ORDER[a.status] - STATUS_ORDER[b.status] ||
+      (a.days ?? Infinity) - (b.days ?? Infinity),
   );
 
   const counts = {
     vehicles: vehicles.length,
     expired: documents.filter((d) => d.status === "expired").length,
-    within30: documents.filter((d) => d.days >= 0 && d.days <= 30).length,
-    within60: documents.filter((d) => d.days > 30 && d.days <= 60).length,
+    within30: documents.filter((d) => d.days !== null && d.days >= 0 && d.days <= 30).length,
+    within60: documents.filter((d) => d.days !== null && d.days > 30 && d.days <= 60).length,
     compliant: compliance.filter((c) => isFullyCompliant(c.compliance)).length,
     missing: compliance.filter((c) => c.compliance.missingTypes.length > 0).length,
   };
@@ -166,8 +168,8 @@ export async function getDashboardData() {
     compliancePercent: vehicles.length ? Math.round((counts.compliant / vehicles.length) * 100) : 0,
     fleetSummary: { compliant: counts.compliant, needAttention, critical },
     byType,
-    urgent: sorted.filter((d) => d.days <= 30).slice(0, 12),
-    upcoming: sorted.filter((d) => d.days > 7 && d.days <= 60),
+    urgent: sorted.filter((d) => d.days !== null && d.days <= 30).slice(0, 12),
+    upcoming: sorted.filter((d) => d.days !== null && d.days > 7 && d.days <= 60),
     compliance,
     documents: sorted,
     requiredTypes,

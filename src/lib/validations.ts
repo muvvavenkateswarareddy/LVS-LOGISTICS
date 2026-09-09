@@ -26,16 +26,21 @@ export const vehicleSchema = z.object({
 });
 export type VehicleInput = z.infer<typeof vehicleSchema>;
 
+/**
+ * Expiry is optional here on purpose - whether a document needs one is a
+ * property of its document type (document_types.requires_expiry), checked
+ * in the server action. RC, for example, never expires.
+ */
 export const documentSchema = z
   .object({
     vehicle_id: z.string().uuid("Vehicle is required"),
     document_type_id: z.string().uuid("Document type is required"),
     document_number: z.string().trim().max(100).optional().or(z.literal("")),
     issue_date: z.string().optional().or(z.literal("")),
-    expiry_date: z.string().min(1, "Expiry date is required"),
+    expiry_date: z.string().optional().or(z.literal("")),
     notes: z.string().trim().max(1000).optional().or(z.literal("")),
   })
-  .refine((d) => !d.issue_date || d.issue_date <= d.expiry_date, {
+  .refine((d) => !d.issue_date || !d.expiry_date || d.issue_date <= d.expiry_date, {
     message: "Expiry date must be after the issue date",
     path: ["expiry_date"],
   });
