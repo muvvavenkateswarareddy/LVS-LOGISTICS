@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PageHeader } from "@/components/page-header";
+import { PushToggle } from "@/components/push-toggle";
 import { removeDemoData, renameFleet, seedDemoData } from "@/server/fleet";
 import { updatePreferences } from "@/server/notifications";
 import { APP_NAME } from "@/lib/utils";
@@ -93,8 +94,9 @@ export function SettingsView({
               In-app alerts are generated at {prefs.lead_days.join(", ")} days before expiry and on the expiry date.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <p className="text-sm font-medium">Channels</p>
+          <CardContent className="space-y-3">
+            <PushToggle />
+            <p className="text-sm font-medium">Other channels</p>
             <ul className="space-y-2">
               <li className="flex items-center justify-between rounded-md border p-2 text-sm">
                 <span>In-app notifications</span>

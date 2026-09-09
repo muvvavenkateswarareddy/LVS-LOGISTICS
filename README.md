@@ -29,6 +29,7 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn-style UI · Supabase
    - `supabase/schema.sql` — tables, indexes, RLS, triggers, storage bucket,
      `renew_document()`, `generate_document_notifications()`
    - `supabase/demo_data.sql` — `seed_demo_data()` / `remove_demo_data()`
+   - `supabase/push_notifications.sql` — device subscriptions for web push
    - `supabase/migration_2026_09_09.sql` — only for databases created before
      09 Sep 2026 (CLL Insurance, permit types removed, optional expiry)
 
@@ -83,6 +84,15 @@ rows at 60/30/15/7/1/0 days before expiry (deduped by
 `(document_id, threshold_days, channel)`). The `channel` column and
 `notification_preferences` are already in place, so an email/SMS/WhatsApp job
 can fan out from the same rows without a schema change.
+
+**Push reminders**: devices subscribe from Settings (`push_subscriptions`),
+and Vercel Cron calls `/api/cron/notify` daily at 02:30 UTC (08:00 IST) with
+`Authorization: Bearer $CRON_SECRET`. That route regenerates each fleet's
+notification rows, sends one digest push per fleet, marks the rows `sent_at`,
+and deletes subscriptions the browser has dropped (404/410). Requires
+`NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`,
+`CRON_SECRET` and `SUPABASE_SERVICE_ROLE_KEY`. iOS delivers push only to a
+PWA installed on the Home Screen.
 
 **Security**: RLS on every table, scoped through `owns_fleet(fleet_id)`; storage
 objects scoped by the fleet-id folder; middleware protects every route outside
