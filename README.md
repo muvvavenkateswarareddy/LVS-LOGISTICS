@@ -22,7 +22,6 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn-style UI · Supabase
    NEXT_PUBLIC_SUPABASE_URL=
    NEXT_PUBLIC_SUPABASE_ANON_KEY=
    SUPABASE_SERVICE_ROLE_KEY=      # server only, never NEXT_PUBLIC_
-   NEXT_PUBLIC_APP_NAME=LVS Logistics # rebrand here
    ```
 
 3. **Database** — in the Supabase SQL editor run, in order:
@@ -53,6 +52,9 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn-style UI · Supabase
 | `npm run build` | Production build |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run check` | Self-check for the expiry/compliance engine |
+
+Product name lives in `APP_NAME` in `src/lib/utils.ts`; the logo files are
+`public/logo.png` (full lockup) and `public/logo-mark.png` (sidebar/app icon).
 
 ## How it works
 

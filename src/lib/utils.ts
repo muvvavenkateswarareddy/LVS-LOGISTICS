@@ -17,5 +17,6 @@ export function toISODate(value: Date) {
   return value.toISOString().slice(0, 10);
 }
 
-export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "LVS Logistics";
+/** Product name. Change this one line to rebrand the whole app. */
+export const APP_NAME = "LVS Logistics";
 export const APP_TAGLINE = "Energy in safe hands";
