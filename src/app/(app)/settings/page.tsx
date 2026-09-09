@@ -1,11 +1,11 @@
-import { getDocumentTypes, getSession, getVehicles } from "@/lib/queries";
+import { getDocumentTypes, getSession, getTeam, getVehicles } from "@/lib/queries";
 import { SettingsView } from "@/components/settings-view";
 
 export const metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
-  const [{ supabase, user, fleet }, types, vehicles] = await Promise.all([
-    getSession(), getDocumentTypes(), getVehicles(),
+  const [{ supabase, user, fleet }, types, vehicles, team] = await Promise.all([
+    getSession(), getDocumentTypes(), getVehicles(), getTeam(),
   ]);
   if (!fleet) return null;
 
@@ -20,6 +20,7 @@ export default async function SettingsPage() {
     <SettingsView
       fleetName={fleet.name}
       userEmail={user.email ?? ""}
+      userId={user.id}
       documentTypes={types}
       prefs={{
         email_enabled: prefs?.email_enabled ?? false,
@@ -28,6 +29,7 @@ export default async function SettingsPage() {
         lead_days: prefs?.lead_days ?? [60, 30, 15, 7, 1, 0],
       }}
       demoCount={vehicles.filter((v) => v.is_demo).length}
+      team={team}
     />
   );
 }

@@ -30,6 +30,7 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn-style UI · Supabase
      `renew_document()`, `generate_document_notifications()`
    - `supabase/demo_data.sql` — `seed_demo_data()` / `remove_demo_data()`
    - `supabase/push_notifications.sql` — device subscriptions for web push
+   - `supabase/team_access.sql` — multiple users on one fleet
    - `supabase/migration_2026_09_09.sql` — only for databases created before
      09 Sep 2026 (CLL Insurance, permit types removed, optional expiry)
 
@@ -93,6 +94,13 @@ and deletes subscriptions the browser has dropped (404/410). Requires
 `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`,
 `CRON_SECRET` and `SUPABASE_SERVICE_ROLE_KEY`. iOS delivers push only to a
 PWA installed on the Home Screen.
+
+**Team access**: `owns_fleet()` returns true for the fleet owner *and* anyone in
+`fleet_members`, so all ten tables inherit multi-user access from that one
+function. The owner invites by email from Settings and shares the generated
+`/invite/<token>` link; signing up with an invited address joins that fleet
+automatically instead of creating a new one. Members have full read/write;
+only the owner can invite, remove people or rename the fleet.
 
 **Security**: RLS on every table, scoped through `owns_fleet(fleet_id)`; storage
 objects scoped by the fleet-id folder; middleware protects every route outside

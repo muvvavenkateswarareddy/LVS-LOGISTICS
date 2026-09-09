@@ -14,6 +14,18 @@ export const getSession = cache(async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // A fleet you were invited to wins over the empty one created at signup.
+  const { data: membership } = await supabase
+    .from("fleet_members")
+    .select("fleet:fleets(id, owner_id, name)")
+    .eq("user_id", user.id)
+    .order("created_at")
+    .limit(1)
+    .maybeSingle();
+
+  const memberFleet = (membership?.fleet ?? null) as Fleet | null;
+  if (memberFleet) return { supabase, user, fleet: memberFleet };
+
   const { data: fleet } = await supabase
     .from("fleets")
     .select("id, owner_id, name")
@@ -173,5 +185,43 @@ export async function getDashboardData() {
     compliance,
     documents: sorted,
     requiredTypes,
+  };
+}
+
+export type TeamMember = {
+  user_id: string;
+  email: string;
+  full_name: string | null;
+  role: string;
+  is_owner: boolean;
+  joined_at: string;
+};
+
+export type PendingInvite = {
+  id: string;
+  email: string;
+  token: string;
+  created_at: string;
+  expires_at: string;
+};
+
+export async function getTeam() {
+  const { supabase, user, fleet } = await getSession();
+  if (!fleet) return { members: [], invites: [], isOwner: false };
+
+  const [{ data: members }, { data: invites }] = await Promise.all([
+    supabase.rpc("list_fleet_members", { p_fleet_id: fleet.id }),
+    supabase
+      .from("fleet_invites")
+      .select("id, email, token, created_at, expires_at")
+      .eq("fleet_id", fleet.id)
+      .is("accepted_at", null)
+      .order("created_at", { ascending: false }),
+  ]);
+
+  return {
+    members: (members as TeamMember[]) ?? [],
+    invites: (invites as PendingInvite[]) ?? [],
+    isOwner: fleet.owner_id === user.id,
   };
 }

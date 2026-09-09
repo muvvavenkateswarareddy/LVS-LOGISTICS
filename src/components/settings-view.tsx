@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PageHeader } from "@/components/page-header";
 import { PushToggle } from "@/components/push-toggle";
+import { TeamCard } from "@/components/team-card";
+import type { PendingInvite, TeamMember } from "@/lib/queries";
 import { removeDemoData, renameFleet, seedDemoData } from "@/server/fleet";
 import { updatePreferences } from "@/server/notifications";
 import { APP_NAME } from "@/lib/utils";
@@ -19,13 +21,15 @@ import type { DocumentType } from "@/lib/types";
 type Prefs = { email_enabled: boolean; sms_enabled: boolean; whatsapp_enabled: boolean; lead_days: number[] };
 
 export function SettingsView({
-  fleetName, userEmail, documentTypes, prefs, demoCount,
+  fleetName, userEmail, userId, documentTypes, prefs, demoCount, team,
 }: {
   fleetName: string;
   userEmail: string;
+  userId: string;
   documentTypes: DocumentType[];
   prefs: Prefs;
   demoCount: number;
+  team: { members: TeamMember[]; invites: PendingInvite[]; isOwner: boolean };
 }) {
   const router = useRouter();
   const [name, setName] = React.useState(fleetName);
@@ -45,6 +49,13 @@ export function SettingsView({
       <PageHeader title="Settings" description={`${APP_NAME} configuration for your fleet.`} />
 
       <div className="grid gap-4 lg:grid-cols-2">
+        <TeamCard
+          members={team.members}
+          invites={team.invites}
+          isOwner={team.isOwner}
+          currentUserId={userId}
+        />
+
         <Card>
           <CardHeader>
             <CardTitle>Fleet</CardTitle>
